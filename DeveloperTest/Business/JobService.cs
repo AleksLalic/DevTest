@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using DeveloperTest.Business.Interfaces;
 using DeveloperTest.Database;
 using DeveloperTest.Database.Models;
@@ -21,7 +22,8 @@ namespace DeveloperTest.Business
             {
                 JobId = x.JobId,
                 Engineer = x.Engineer,
-                When = x.When
+                When = x.When,
+                Customer=new CustomerModel { CustomerId = x.Customer.CustomerId, Name = x.Customer.Name, Type = x.Customer.Type }
             }).ToArray();
         }
 
@@ -31,7 +33,8 @@ namespace DeveloperTest.Business
             {
                 JobId = x.JobId,
                 Engineer = x.Engineer,
-                When = x.When
+                When = x.When,
+                Customer = new CustomerModel { CustomerId = x.Customer.CustomerId, Name = x.Customer.Name, Type = x.Customer.Type }
             }).SingleOrDefault();
         }
 
@@ -40,16 +43,19 @@ namespace DeveloperTest.Business
             var addedJob = context.Jobs.Add(new Job
             {
                 Engineer = model.Engineer,
-                When = model.When
+                When = model.When,
+                CustomerId = model.CustomerId
             });
 
             context.SaveChanges();
-
+            var cust = context.Customers.SingleOrDefault(x => x.CustomerId == model.CustomerId);
             return new JobModel
             {
                 JobId = addedJob.Entity.JobId,
                 Engineer = addedJob.Entity.Engineer,
-                When = addedJob.Entity.When
+                When = addedJob.Entity.When,
+                Customer = new CustomerModel { CustomerId=model.CustomerId,
+                Name=cust.Name, Type=cust.Type}
             };
         }
     }
